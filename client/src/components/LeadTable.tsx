@@ -66,13 +66,14 @@ const LeadTable = ({
       {openEditModal &&
         selectedLead && (
           <EditLeadModal
-            token={token}
-            lead={selectedLead}
-            onClose={() =>
-              setOpenEditModal(false)
-            }
-            fetchLeads={fetchLeads}
-          />
+  token={token}
+  lead={selectedLead}
+  onClose={() =>
+    setOpenEditModal(false)
+  }
+  fetchLeads={fetchLeads}
+  darkMode={darkMode}
+/>
         )}
 
       <div className="overflow-x-auto">
