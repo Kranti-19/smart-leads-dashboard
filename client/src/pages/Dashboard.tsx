@@ -56,12 +56,12 @@ const Dashboard = () => {
         page,
       });
 
-      setLeads(response.data?.leads || []);
+      setLeads(response.data?.data || []);
 
       setTotalPages(
-        response.data?.pagination
-          ?.totalPages || 1
-      );
+  response.data?.pagination
+    ?.totalPages || 1
+);
     } catch (error: any) {
       toast.error(
         error.response?.data?.message ||
