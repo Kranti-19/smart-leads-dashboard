@@ -165,22 +165,29 @@ npm run dev
 ---
 
 ## 📸 Screenshots
+---
 
 ### Dashboard - Light Mode
 
-*Add screenshot here*
+![Dashboard Light](./screenshots/dashboard-light.png)
+
+---
 
 ### Dashboard - Dark Mode
 
-*Add screenshot here*
+![Dashboard Dark](./screenshots/dashboard-dark.png)
+
+---
 
 ### Create Lead Modal
 
-*Add screenshot here*
+![Create Lead](./screenshots/create-lead.png)
+
+---
 
 ### Edit Lead Modal
 
-*Add screenshot here*
+![Edit Lead](./screenshots/edit-lead.png)
 
 ---
 
