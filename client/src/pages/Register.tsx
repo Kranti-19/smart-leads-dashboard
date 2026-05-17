@@ -92,6 +92,21 @@ const Register = () => {
           >
             Register
           </button>
+
+          <p className="mt-4 text-sm text-center">
+            Already have an account?{" "}
+            
+            <span
+              onClick={() =>
+                (window.location.href =
+                  "/login")
+              }
+              className="font-medium text-blue-600 cursor-pointer hover:underline"
+            >
+              Login
+            </span>
+          </p>
+
         </form>
       </div>
     </div>

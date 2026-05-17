@@ -10,12 +10,15 @@ interface CreateLeadModalProps {
   onClose: () => void;
 
   fetchLeads: () => void;
+
+  darkMode: boolean;
 }
 
 const CreateLeadModal = ({
   token,
   onClose,
   fetchLeads,
+  darkMode,
 }: CreateLeadModalProps) => {
   const [formData, setFormData] =
     useState({
@@ -61,16 +64,28 @@ const CreateLeadModal = ({
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/40">
-      <div className="w-full max-w-md p-6 bg-white rounded-2xl">
-        <div className="flex items-center justify-between mb-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div
+        className={`w-full max-w-md p-6 rounded-2xl shadow-xl transition-all
+        ${
+          darkMode
+            ? "bg-gray-900 text-white"
+            : "bg-white text-black"
+        }`}
+      >
+        <div className="flex items-center justify-between mb-5">
           <h2 className="text-2xl font-bold">
             Create Lead
           </h2>
 
           <button
             onClick={onClose}
-            className="text-xl"
+            className={`text-xl font-bold
+            ${
+              darkMode
+                ? "text-gray-300 hover:text-white"
+                : "text-gray-600 hover:text-black"
+            }`}
           >
             ✕
           </button>
@@ -86,7 +101,12 @@ const CreateLeadModal = ({
             placeholder="Enter name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full p-3 border rounded-lg"
+            className={`w-full p-3 border rounded-lg outline-none
+            ${
+              darkMode
+                ? "bg-gray-800 text-white border-gray-700 placeholder-gray-400"
+                : "bg-white text-black border-gray-300"
+            }`}
           />
 
           <input
@@ -95,14 +115,24 @@ const CreateLeadModal = ({
             placeholder="Enter email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full p-3 border rounded-lg"
+            className={`w-full p-3 border rounded-lg outline-none
+            ${
+              darkMode
+                ? "bg-gray-800 text-white border-gray-700 placeholder-gray-400"
+                : "bg-white text-black border-gray-300"
+            }`}
           />
 
           <select
             name="status"
             value={formData.status}
             onChange={handleChange}
-            className="w-full p-3 border rounded-lg"
+            className={`w-full p-3 border rounded-lg outline-none
+            ${
+              darkMode
+                ? "bg-gray-800 text-white border-gray-700"
+                : "bg-white text-black border-gray-300"
+            }`}
           >
             <option value="new">
               New
@@ -125,7 +155,12 @@ const CreateLeadModal = ({
             name="source"
             value={formData.source}
             onChange={handleChange}
-            className="w-full p-3 border rounded-lg"
+            className={`w-full p-3 border rounded-lg outline-none
+            ${
+              darkMode
+                ? "bg-gray-800 text-white border-gray-700"
+                : "bg-white text-black border-gray-300"
+            }`}
           >
             <option value="website">
               Website
@@ -142,7 +177,7 @@ const CreateLeadModal = ({
 
           <button
             type="submit"
-            className="w-full py-3 text-white bg-blue-600 rounded-lg"
+            className="w-full py-3 font-medium text-white transition-all bg-blue-600 rounded-lg hover:bg-blue-700"
           >
             Create Lead
           </button>
