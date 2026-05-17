@@ -32,9 +32,14 @@ const Register = () => {
       toast.success(response.message);
 
       console.log(response);
-    } catch (error) {
-      toast.error("Registration failed");
-    }
+    } catch (error: any) {
+  console.log(error);
+
+  toast.error(
+    error.response?.data?.message ||
+    "Registration failed"
+  );
+}
   };
 
   return (

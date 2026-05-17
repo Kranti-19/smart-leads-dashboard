@@ -56,10 +56,11 @@ const Dashboard = () => {
         page,
       });
 
-      setLeads(response.data.leads);
+      setLeads(response.data?.leads || []);
 
       setTotalPages(
-        response.data.pagination.totalPages
+        response.data?.pagination
+          ?.totalPages || 1
       );
     } catch (error: any) {
       toast.error(
@@ -108,7 +109,7 @@ const Dashboard = () => {
           </h1>
 
           <p className="mt-2 text-xl">
-            Welcome, {user.name}
+            Welcome, {user?.name || "User"}
           </p>
         </div>
 

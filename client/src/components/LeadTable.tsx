@@ -109,8 +109,8 @@ const LeadTable = ({
                 : "bg-white"
             }
           >
-  {leads.length > 0 ? (
-    leads.map((lead) => (
+  {(leads || []).length > 0 ? (
+    (leads || []).map((lead) => (
       <tr
         key={lead._id}
         className={`border-b ${
