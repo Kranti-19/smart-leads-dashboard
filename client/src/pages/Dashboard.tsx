@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 
-import LeadTable from "../components/LeadTable";
-
 import CreateLeadModal from "../components/CreateLeadModal";
+
+import EditLeadModal from "../components/EditLeadModal";
 
 import toast from "react-hot-toast";
 
-import { getLeads } from "../services/lead.service";
+import { getLeads, deleteLead } from "../services/lead.service";
 
 import type { Lead } from "../types/lead.types";
 
@@ -17,15 +17,20 @@ const Dashboard = () => {
     localStorage.getItem("user") || "{}"
   );
 
-  const [leads, setLeads] = useState<Lead[]>(
-    []
-  );
+  const [leads, setLeads] =
+    useState<Lead[]>([]);
 
   const [loading, setLoading] =
     useState(false);
 
   const [openModal, setOpenModal] =
     useState(false);
+
+  const [openEditModal, setOpenEditModal] =
+    useState(false);
+
+  const [selectedLead, setSelectedLead] =
+    useState<Lead | null>(null);
 
   const [search, setSearch] =
     useState("");
@@ -36,7 +41,8 @@ const Dashboard = () => {
   const [source, setSource] =
     useState("");
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] =
+    useState(1);
 
   const [totalPages, setTotalPages] =
     useState(1);
@@ -56,70 +62,121 @@ const Dashboard = () => {
         page,
       });
 
-      setLeads(response.data?.data || []);
+      const fetchedLeads =
+        response?.data || [];
+
+      setLeads(
+        Array.isArray(fetchedLeads)
+          ? fetchedLeads
+          : []
+      );
 
       setTotalPages(
-  response.data?.pagination
-    ?.totalPages || 1
-);
+        response?.pagination
+          ?.totalPages || 1
+      );
     } catch (error: any) {
+      console.log(error);
+
       toast.error(
-        error.response?.data?.message ||
-          "Failed to fetch leads"
+        "Failed to fetch leads"
       );
     } finally {
       setLoading(false);
     }
   };
 
+  const handleDelete = async (
+    id: string
+  ) => {
+    const confirmDelete =
+      window.confirm(
+        "Are you sure you want to delete this lead?"
+      );
+
+    if (!confirmDelete) return;
+
+    try {
+      const response = await deleteLead(
+        token as string,
+        id
+      );
+
+      toast.success(response.message);
+
+      fetchLeads();
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to delete lead"
+      );
+    }
+  };
+
   useEffect(() => {
     if (!token) {
-      window.location.href = "/login";
+      window.location.href =
+        "/login";
     }
   }, [token]);
 
   useEffect(() => {
-    fetchLeads();
-  }, [page, search, status, source]);
+    const timeout =
+      setTimeout(() => {
+        fetchLeads();
+      }, 300);
+
+    return () =>
+      clearTimeout(timeout);
+  }, [
+    page,
+    search,
+    status,
+    source,
+  ]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem(
+      "token"
+    );
 
-    localStorage.removeItem("user");
+    localStorage.removeItem(
+      "user"
+    );
 
     toast.success("Logged out");
 
-    window.location.href = "/login";
+    window.location.href =
+      "/login";
   };
 
   return (
     <div
-      className={`min-h-screen p-6 transition-all
-      ${
+      className={`min-h-screen p-6 transition-all ${
         darkMode
           ? "bg-[#0f172a] text-white"
           : "bg-gray-100 text-black"
       }`}
     >
       {/* HEADER */}
-      <div className="flex items-start justify-between mb-8">
+      <div className="flex flex-col gap-4 mb-8 md:flex-row md:items-start md:justify-between">
         <div>
           <h1 className="text-5xl font-bold text-blue-600">
             Smart Leads Dashboard
           </h1>
 
           <p className="mt-2 text-xl">
-            Welcome, {user?.name || "User"}
+            Welcome,{" "}
+            {user?.name || "User"}
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() =>
               setDarkMode(!darkMode)
             }
-            className={`px-5 py-3 rounded-xl font-medium
-            ${
+            className={`px-5 py-3 rounded-xl font-medium ${
               darkMode
                 ? "bg-gray-800 text-white"
                 : "bg-gray-200 text-black"
@@ -155,10 +212,11 @@ const Dashboard = () => {
           placeholder="Search by name or email..."
           value={search}
           onChange={(e) =>
-            setSearch(e.target.value)
+            setSearch(
+              e.target.value
+            )
           }
-          className={`p-4 border rounded-xl outline-none
-          ${
+          className={`p-4 border rounded-xl outline-none ${
             darkMode
               ? "bg-gray-800 border-gray-700 text-white placeholder-gray-400"
               : "bg-white border-gray-300 text-black"
@@ -168,10 +226,11 @@ const Dashboard = () => {
         <select
           value={status}
           onChange={(e) =>
-            setStatus(e.target.value)
+            setStatus(
+              e.target.value
+            )
           }
-          className={`p-4 border rounded-xl outline-none
-          ${
+          className={`p-4 border rounded-xl outline-none ${
             darkMode
               ? "bg-gray-800 border-gray-700 text-white"
               : "bg-white border-gray-300 text-black"
@@ -201,10 +260,11 @@ const Dashboard = () => {
         <select
           value={source}
           onChange={(e) =>
-            setSource(e.target.value)
+            setSource(
+              e.target.value
+            )
           }
-          className={`p-4 border rounded-xl outline-none
-          ${
+          className={`p-4 border rounded-xl outline-none ${
             darkMode
               ? "bg-gray-800 border-gray-700 text-white"
               : "bg-white border-gray-300 text-black"
@@ -228,7 +288,7 @@ const Dashboard = () => {
         </select>
       </div>
 
-      {/* MODAL */}
+      {/* MODALS */}
       {openModal && (
         <CreateLeadModal
           token={token as string}
@@ -240,6 +300,19 @@ const Dashboard = () => {
         />
       )}
 
+      {openEditModal &&
+        selectedLead && (
+          <EditLeadModal
+            token={token as string}
+            lead={selectedLead}
+            onClose={() =>
+              setOpenEditModal(false)
+            }
+            fetchLeads={fetchLeads}
+            darkMode={darkMode}
+          />
+        )}
+
       {/* TABLE */}
       {loading ? (
         <div className="flex items-center justify-center mt-20">
@@ -247,19 +320,150 @@ const Dashboard = () => {
         </div>
       ) : (
         <>
-          <LeadTable
-            leads={leads}
-            token={token as string}
-            fetchLeads={fetchLeads}
-            darkMode={darkMode}
-          />
+          <h1 className="mb-4 text-2xl text-white">
+            Total Leads: {leads.length}
+          </h1>
+
+          <div className="overflow-x-auto rounded-xl">
+            <table className="w-full">
+              <thead className="bg-blue-600 text-white">
+                <tr>
+                  <th className="p-4 text-left">
+                    Name
+                  </th>
+
+                  <th className="p-4 text-left">
+                    Email
+                  </th>
+
+                  <th className="p-4 text-left">
+                    Status
+                  </th>
+
+                  <th className="p-4 text-left">
+                    Source
+                  </th>
+
+                  <th className="p-4 text-center">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody
+                className={
+                  darkMode
+                    ? "bg-gray-800"
+                    : "bg-white"
+                }
+              >
+                {leads.length > 0 ? (
+                  leads.map((lead) => (
+                    <tr
+                      key={lead._id}
+                      className={`border-b ${
+                        darkMode
+                          ? "border-gray-700"
+                          : "border-gray-200"
+                      }`}
+                    >
+                      <td
+                        className={`p-4 ${
+                          darkMode
+                            ? "text-white"
+                            : "text-black"
+                        }`}
+                      >
+                        {lead.name}
+                      </td>
+
+                      <td
+                        className={`p-4 ${
+                          darkMode
+                            ? "text-white"
+                            : "text-black"
+                        }`}
+                      >
+                        {lead.email}
+                      </td>
+
+                      <td
+                        className={`p-4 ${
+                          darkMode
+                            ? "text-white"
+                            : "text-black"
+                        }`}
+                      >
+                        {lead.status}
+                      </td>
+
+                      <td
+                        className={`p-4 ${
+                          darkMode
+                            ? "text-white"
+                            : "text-black"
+                        }`}
+                      >
+                        {lead.source}
+                      </td>
+
+                      <td className="p-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => {
+                              setSelectedLead(
+                                lead
+                              );
+
+                              setOpenEditModal(
+                                true
+                              );
+                            }}
+                            className="px-3 py-1 text-sm text-white bg-yellow-500 rounded-lg hover:bg-yellow-600"
+                          >
+                            Edit
+                          </button>
+
+                          {user.role ===
+                            "admin" && (
+                            <button
+                              onClick={() =>
+                                handleDelete(
+                                  lead._id
+                                )
+                              }
+                              className="px-3 py-1 text-sm text-white bg-red-500 rounded-lg hover:bg-red-600"
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="p-8 text-center text-gray-400"
+                    >
+                      No leads found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
 
           {/* PAGINATION */}
           <div className="flex items-center justify-center mt-8 space-x-4">
             <button
               disabled={page === 1}
               onClick={() =>
-                setPage((prev) => prev - 1)
+                setPage(
+                  (prev) =>
+                    prev - 1
+                )
               }
               className="px-5 py-2 text-white bg-gray-500 rounded-lg disabled:opacity-50"
             >
@@ -276,7 +480,10 @@ const Dashboard = () => {
                 page === totalPages
               }
               onClick={() =>
-                setPage((prev) => prev + 1)
+                setPage(
+                  (prev) =>
+                    prev + 1
+                )
               }
               className="px-5 py-2 text-white bg-gray-500 rounded-lg disabled:opacity-50"
             >
